@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 14:17:46 by pandalaf          #+#    #+#             */
-/*   Updated: 2022/11/28 14:17:47 by pandalaf         ###   ########.fr       */
+/*   Updated: 2022/11/28 14:43:37 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,14 @@
 # define BUFFER_SIZE 1
 #endif
 
+//Function frees a pointer and returns null.
 char	*freeptr(char *ptr)
 {
 	free(ptr);
 	return (0);
 }
 
+//Function gets the text before a newline character in a file descriptor.
 char	*get_next_line(int fd)
 {
 	int		i;
@@ -56,6 +58,7 @@ char	*get_next_line(int fd)
 //Make a test file titled "hello"
 #include <stdio.h>
 #include <fcntl.h>
+
 int main(void)
 {
 	int	fd = open("hello", O_RDONLY);

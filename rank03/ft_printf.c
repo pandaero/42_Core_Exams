@@ -1,6 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 14:17:42 by pandalaf          #+#    #+#             */
+/*   Updated: 2022/11/28 14:27:40 by pandalaf         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <unistd.h>
 #include <stdarg.h>
 
+//Function writes a string to standard output.
 int	writestr(char *str)
 {
 	int	i;
@@ -18,6 +31,7 @@ int	writestr(char *str)
 	return (ct);
 }
 
+//Function writes a positive number to standard output.
 int	writingnum(int num)
 {
 	int		i;
@@ -41,6 +55,7 @@ int	writingnum(int num)
 	return (ct);
 }
 
+//Function writes an integer to standard output.
 int	writenum(int num)
 {
 	int		ct;
@@ -59,6 +74,7 @@ int	writenum(int num)
 	return (ct);
 }
 
+//Function writes a hexadecimal number to standard output.
 int	writehex(unsigned int num)
 {
 	int		i;
@@ -87,6 +103,7 @@ int	writehex(unsigned int num)
 	return (ct);
 }
 
+//Function determines what type to write to standard output from the format.
 int	interpreter(int i, const char *format, va_list args)
 {
 	int	ct;
@@ -101,6 +118,7 @@ int	interpreter(int i, const char *format, va_list args)
 	return (ct);
 }
 
+//Function writes a formatted string to standard output.
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
@@ -125,9 +143,10 @@ int	ft_printf(const char *format, ...)
 	return (ct);
 }
 
-/* Test (comment out this line only)
+/* Test (to run, comment out this line only)
 #include <stdio.h>
 #include <limits.h>
+
 int	main(void)
 {
 	int		ret;
