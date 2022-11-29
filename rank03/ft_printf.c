@@ -6,12 +6,13 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 14:17:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2022/11/28 15:07:21 by pandalaf         ###   ########.fr       */
+/*   Updated: 2022/11/29 12:35:55 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include <stdarg.h>
+#include <limits.h>
 
 //Function writes a string to standard output.
 int	writestr(char *str)
@@ -62,7 +63,7 @@ int	writeint(int num)
 
 	if (num == 0)
 		return (write(1, "0", 1));
-	if (num == -2147483648)
+	if (num == INT_MIN)
 		return (write(1, "-2147483648", 11));
 	ct = 0;
 	if (num < 0)
@@ -188,6 +189,34 @@ int	main(void)
 	ret = ft_printf("%s: %s\n", "String", str);
 	printf("Out: %d\n", ret);
 	printf("=======================\n");
+	return (0);
+}
+//*/
+
+/* Compact test (to run, comment out this line only)
+#include <stdio.h>
+#include <limits.h>
+
+int	main(void)
+{
+	int		ret;
+	char	*str = NULL;
+
+	printf("========== TEST ==========\n");
+	ret = printf("String: %s, Null: %s\n", "Hello", str);
+	printf("Ret: %d\n", ret);
+	ret = ft_printf("String: %s, Null: %s\n", "Hello", str);
+	printf("Ret: %d\n", ret);
+	ret = printf("p-int: %d, n-int: %d, z-int: %d, mn-int: %d\n", \
+											6543, -23456, 0, INT_MIN);
+	printf("Ret: %d\n", ret);
+	ret = ft_printf("p-int: %d, n-int: %d, z-int: %d, mn-int: %d\n", \
+											6543, -23456, 0, INT_MIN);
+	printf("Ret: %d\n", ret);
+	ret = printf("z-hex: %x, hex: %x\n", 0, 4356);
+	printf("Ret: %d\n", ret);
+	ret = ft_printf("z-hex: %x, hex: %x\n", 0, 4356);
+	printf("Ret: %d\n", ret);
 	return (0);
 }
 //*/
