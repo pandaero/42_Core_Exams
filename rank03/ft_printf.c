@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 14:17:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2022/11/28 14:27:40 by pandalaf         ###   ########.fr       */
+/*   Updated: 2022/11/28 15:07:21 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	writingnum(int num)
 }
 
 //Function writes an integer to standard output.
-int	writenum(int num)
+int	writeint(int num)
 {
 	int		ct;
 
@@ -112,7 +112,7 @@ int	interpreter(int i, const char *format, va_list args)
 	if (format[i + 1] == 's')
 		ct += writestr(va_arg(args, char *));
 	if (format[i + 1] == 'd')
-		ct += writenum(va_arg(args, int));
+		ct += writeint(va_arg(args, int));
 	if (format[i + 1] == 'x')
 		ct += writehex(va_arg(args, unsigned int));
 	return (ct);
