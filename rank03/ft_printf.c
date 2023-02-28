@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 14:17:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2022/11/29 12:35:55 by pandalaf         ###   ########.fr       */
+/*   Updated: 2023/02/28 13:29:32 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,21 +104,6 @@ int	writehex(unsigned int num)
 	return (ct);
 }
 
-//Function determines what type to write to standard output from the format.
-int	interpreter(int i, const char *format, va_list args)
-{
-	int	ct;
-
-	ct = 0;
-	if (format[i + 1] == 's')
-		ct += writestr(va_arg(args, char *));
-	if (format[i + 1] == 'd')
-		ct += writeint(va_arg(args, int));
-	if (format[i + 1] == 'x')
-		ct += writehex(va_arg(args, unsigned int));
-	return (ct);
-}
-
 //Function writes a formatted string to standard output.
 int	ft_printf(const char *format, ...)
 {
@@ -133,7 +118,12 @@ int	ft_printf(const char *format, ...)
 	{
 		if (format[i] == '%')
 		{
-			ct += interpreter(i, format, args);
+			if (format[i + 1] == 's')
+				ct += writestr(va_arg(args, char *));
+			if (format[i + 1] == 'd')
+				ct += writeint(va_arg(args, int));
+			if (format[i + 1] == 'x')
+				ct += writehex(va_arg(args, unsigned int));
 			i++;
 		}
 		else
