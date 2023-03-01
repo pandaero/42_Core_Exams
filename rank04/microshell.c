@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 13:34:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2023/03/01 12:27:47 by pandalaf         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:22:45 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include <stdio.h>
-
 //Working file descriptor.
-int	temp_fd;
+int	g_temp;
 
 //Function writes to standard error.
 int	write_error(char *str)
@@ -31,10 +29,8 @@ int	write_error(char *str)
 //Function is a built-in directory changer.
 int	cd(char **argv, int i)
 {
-	//Check there are only two (three) arguments.
 	if (i != 2)
 		return (write_error("error: cd: bad arguments\n"));
-	//Make sure the path is openable. Success is 0.
 	if (chdir(argv[1]))
 	{
 		write_error("error: cd: cannot change directory to ");
@@ -44,6 +40,20 @@ int	cd(char **argv, int i)
 	return (EXIT_SUCCESS);
 }
 
+//Function performs the child process actions.
+int	child(char **argv, char **env, int i, int *arr[3])
+{
+	argv[i] = 0;
+	if (dup2(g_temp, STDIN_FILENO) == -1 | close(g_temp) == -1 | \
+		(*arr[0] && (dup2(*arr[2], STDOUT_FILENO)) == -1 | \
+		close(*arr[1]) == -1 | close(*arr[2]) == -1))
+		return (write_error("error: fatal\n"));
+	execve(*argv, argv, env);
+	write_error("error: cannot execute ");
+	write_error(*argv);
+	return (write_error("\n"));
+}
+
 //Function executes command line starting with i argument.
 int	execute(char **argv, char **env, int i)
 {
@@ -51,44 +61,21 @@ int	execute(char **argv, char **env, int i)
 	int	pip;
 	int	pid;
 	int	ret;
+	int	*childarr[3];
 
-	//Whether finishing argument is pipe.
+	childarr[0] = &pip;
+	childarr[1] = &files[0];
+	childarr[2] = &files[1];
 	pip = (argv[i] && !strcmp(argv[i], "|"));
-
-	//If it is a pipe, perform piping with files array. Pipe success 0.
 	if (pip && pipe(files))
 		return (write_error("error: fatal\n"));
-	
-	//Create a process for the command line.
 	pid = fork();
-	//For child (pid = 0).
 	if (!pid)
-	{
-		//Unsure what this does.
-		argv[i] = 0;
-		//Duplicate STDIN to temp file. Close temp file.
-		//If pipe, duplicate STDOUT to WRITE file.
-		//(if pipe) Close READ file. Close WRITE file.
-		//Any error return fatal message.
-		if (dup2(temp_fd, STDIN_FILENO) == -1 | close(temp_fd) == -1 | \
-			(pip && (dup2(files[1], STDOUT_FILENO)) == -1 | \
-			close(files[0]) == -1 | close(files[1]) == -1))
-			return (write_error("error: fatal\n"));
-		//Make child a new process.
-		execve(*argv, argv, env);
-		//Return execution error if still here.
-		write_error("error: cannot execute ");
-		write_error(*argv);
-		return (write_error("\n"));
-	}
-	//If pipe, duplicate temp file to READ file. Close READ file. Close WRITE.
-	//If not pipe, duplicate temp file to STDIN.
-	//Any error return fatal message.
-	if ((pip && (dup2(files[0], temp_fd) == -1 | close(files[0]) == -1 | \
-		close(files[1]) == -1)) | (!pip && dup2(STDIN_FILENO, temp_fd) == -1) \
+		return (child(argv, env, i, childarr));
+	if ((pip && (dup2(files[0], g_temp) == -1 | close(files[0]) == -1 | \
+		close(files[1]) == -1)) | (!pip && dup2(STDIN_FILENO, g_temp) == -1) \
 		| waitpid(pid, &ret, 0) == -1)
 		return (write_error("error: fatal\n"));
-	//Return exit status.
 	return (WIFEXITED(ret) && WEXITSTATUS(ret));
 }
 
@@ -99,29 +86,21 @@ int	main(int argc, char **argv, char **env)
 	int	ret;
 
 	(void) argc;
-	//Duplicate STDIN to temp file.
-	temp_fd = dup(STDIN_FILENO);
-
+	g_temp = dup(STDIN_FILENO);
 	ret = EXIT_SUCCESS;
 	i = 0;
-	//If argument element is valid and so is the next one.
 	while (argv[i] && argv[++i])
 	{
-		//Skip to the next argument.
 		argv += i;
-		//Reset skipping counter.
 		i = 0;
-		//If argument element is not pipe or semi-colon, count contained args.
 		while (argv[i] && strcmp(argv[i], "|") && strcmp(argv[i], ";"))
 			i++;
-		//If argument calls builtin, perform builtin.
 		if (!strcmp(*argv, "cd"))
 			ret = cd(argv, i);
-		//Pass argument that calls plus contained arguments. If non-zero args.
 		else if (i)
 			ret = execute(argv, env, i);
 	}
-	//Check if error in command line, else return value up to now.
-	ret = ((dup2(0, temp_fd) == -1) && write_error("error: fatal\n")) | ret;
+	ret = ((dup2(STDIN_FILENO, g_temp) == -1) && \
+			write_error("error: fatal\n")) | ret;
 	return (ret);
 }
