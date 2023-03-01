@@ -4,7 +4,7 @@
 #include <sys/wait.h>
 
 //Temp file
-int	g_fd;
+int	g_temp;
 
 //Function writes string to STDERR
 int	we(const char *str)
@@ -34,13 +34,14 @@ int	ex(char **argv, char **env, int i)
 	int	files[2];
 	int	pid, ret;
 	int pip = (argv[i] && !strcmp(argv[i], "|"));
+
 	if (pip && pipe(files))
 		return (we("error: fatal\n"));
 	pid = fork();
 	if (!pid)
 	{
 		argv[i] = NULL;
-		if ((dup2(g_fd, STDIN_FILENO) == -1 | close(g_fd) == -1) | \
+		if ((dup2(g_temp, STDIN_FILENO) == -1 | close(g_temp) == -1) | \
 			(pip && dup2(files[1], STDOUT_FILENO) == -1 | close(files[0]) == -1 | close(files[1]) == -1))
 			return (we("error: fatal\n"));
 		execve(*argv, argv, env);
@@ -48,8 +49,8 @@ int	ex(char **argv, char **env, int i)
 		we(*argv);
 		return (we("\n"));
 	}
-	if ((pip && dup2(files[0], g_fd) == -1 | close(files[0]) == -1 | close(files[1]) == -1) | \
-		(!pip && dup2(STDIN_FILENO, g_fd) == -1) | \
+	if ((pip && dup2(files[0], g_temp) == -1 | close(files[0]) == -1 | close(files[1]) == -1) | \
+		(!pip && dup2(STDIN_FILENO, g_temp) == -1) | \
 		waitpid(pid, &ret, 0) == -1)
 		return (we("error: fatal\n"));
 	return (WIFEXITED(ret) && WEXITSTATUS(ret));
@@ -62,7 +63,7 @@ int	main(int argc, char **argv, char **env)
 	int	ret = EXIT_SUCCESS;
 
 	(void) argc;
-	g_fd = dup(STDIN_FILENO);
+	g_temp = dup(STDIN_FILENO);
 	while (argv[i] && argv[++i])
 	{
 		argv += i;
@@ -74,6 +75,6 @@ int	main(int argc, char **argv, char **env)
 		else if (i)
 			ret = ex(argv, env, i);
 	}
-	ret = (dup2(STDIN_FILENO, g_fd) == -1 && we("error: fatal\n")) | ret;
+	ret = (dup2(STDIN_FILENO, g_temp) == -1 && we("error: fatal\n")) | ret;
 	return (ret);
 }
