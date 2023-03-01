@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 13:34:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2023/03/01 14:22:45 by pandalaf         ###   ########.fr       */
+/*   Updated: 2023/03/01 14:37:09 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,10 +57,10 @@ int	child(char **argv, char **env, int i, int *arr[3])
 //Function executes command line starting with i argument.
 int	execute(char **argv, char **env, int i)
 {
-	int	files[2];
 	int	pip;
 	int	pid;
 	int	ret;
+	int	files[2];
 	int	*childarr[3];
 
 	childarr[0] = &pip;
