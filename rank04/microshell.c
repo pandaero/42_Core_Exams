@@ -1,94 +1,68 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   microshell.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/28 13:34:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2023/03/01 14:37:09 by pandalaf         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
 
-//Working file descriptor.
-int	g_temp;
+//Temp file
+int	g_fd;
 
-//Function writes to standard error.
-int	write_error(char *str)
+//Function writes string to STDERR
+int	we(const char *str)
 {
-	while (*str != '\0')
+	while (*str)
 		write(STDERR_FILENO, str++, 1);
 	return (EXIT_FAILURE);
 }
 
-//Function is a built-in directory changer.
+//Function performs directory change
 int	cd(char **argv, int i)
 {
 	if (i != 2)
-		return (write_error("error: cd: bad arguments\n"));
+		return (we("error: cd: bad arguments\n"));
 	if (chdir(argv[1]))
 	{
-		write_error("error: cd: cannot change directory to ");
-		write_error(argv[1]);
-		return (write_error("\n"));
+		we("error: cd: cannot change directory to ");
+		we(argv[1]);
+		return (we("\n"));
 	}
 	return (EXIT_SUCCESS);
 }
 
-//Function performs the child process actions.
-int	child(char **argv, char **env, int i, int *arr[3])
+//Function executes command line
+int	ex(char **argv, char **env, int i)
 {
-	argv[i] = 0;
-	if (dup2(g_temp, STDIN_FILENO) == -1 | close(g_temp) == -1 | \
-		(*arr[0] && (dup2(*arr[2], STDOUT_FILENO)) == -1 | \
-		close(*arr[1]) == -1 | close(*arr[2]) == -1))
-		return (write_error("error: fatal\n"));
-	execve(*argv, argv, env);
-	write_error("error: cannot execute ");
-	write_error(*argv);
-	return (write_error("\n"));
-}
-
-//Function executes command line starting with i argument.
-int	execute(char **argv, char **env, int i)
-{
-	int	pip;
-	int	pid;
-	int	ret;
 	int	files[2];
-	int	*childarr[3];
-
-	childarr[0] = &pip;
-	childarr[1] = &files[0];
-	childarr[2] = &files[1];
-	pip = (argv[i] && !strcmp(argv[i], "|"));
+	int	pid, ret;
+	int pip = (argv[i] && !strcmp(argv[i], "|"));
 	if (pip && pipe(files))
-		return (write_error("error: fatal\n"));
+		return (we("error: fatal\n"));
 	pid = fork();
 	if (!pid)
-		return (child(argv, env, i, childarr));
-	if ((pip && (dup2(files[0], g_temp) == -1 | close(files[0]) == -1 | \
-		close(files[1]) == -1)) | (!pip && dup2(STDIN_FILENO, g_temp) == -1) \
-		| waitpid(pid, &ret, 0) == -1)
-		return (write_error("error: fatal\n"));
+	{
+		argv[i] = NULL;
+		if ((dup2(g_fd, STDIN_FILENO) == -1 | close(g_fd) == -1) | \
+			(pip && dup2(files[1], STDOUT_FILENO) == -1 | close(files[0]) == -1 | close(files[1]) == -1))
+			return (we("error: fatal\n"));
+		execve(*argv, argv, env);
+		we("error: cannot execute ");
+		we(*argv);
+		return (we("\n"));
+	}
+	if ((pip && dup2(files[0], g_fd) == -1 | close(files[0]) == -1 | close(files[1]) == -1) | \
+		(!pip && dup2(STDIN_FILENO, g_fd) == -1) | \
+		waitpid(pid, &ret, 0) == -1)
+		return (we("error: fatal\n"));
 	return (WIFEXITED(ret) && WEXITSTATUS(ret));
 }
 
-//Program is a small command line executor.
+//Program is a small command line executor
 int	main(int argc, char **argv, char **env)
 {
-	int	i;
-	int	ret;
+	int	i = 0;
+	int	ret = EXIT_SUCCESS;
 
 	(void) argc;
-	g_temp = dup(STDIN_FILENO);
-	ret = EXIT_SUCCESS;
-	i = 0;
+	g_fd = dup(STDIN_FILENO);
 	while (argv[i] && argv[++i])
 	{
 		argv += i;
@@ -98,9 +72,8 @@ int	main(int argc, char **argv, char **env)
 		if (!strcmp(*argv, "cd"))
 			ret = cd(argv, i);
 		else if (i)
-			ret = execute(argv, env, i);
+			ret = ex(argv, env, i);
 	}
-	ret = ((dup2(STDIN_FILENO, g_temp) == -1) && \
-			write_error("error: fatal\n")) | ret;
+	ret = (dup2(STDIN_FILENO, g_fd) == -1 && we("error: fatal\n")) | ret;
 	return (ret);
 }
