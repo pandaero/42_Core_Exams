@@ -6,7 +6,7 @@
 /*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/28 13:34:42 by pandalaf          #+#    #+#             */
-/*   Updated: 2023/03/01 14:36:15 by pandalaf         ###   ########.fr       */
+/*   Updated: 2023/03/01 18:27:04 by pandalaf         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,3 +127,4 @@ int	main(int argc, char **argv, char **env)
 //Tests
 // ./microshell cd .. ";" /bin/ls
 // ./microshell /bin/ls "|" /usr/bin/grep microshell "|" /usr/bin/wc -l ";" /bin/echo hello world
+// ./microshell blah ";" /bin/echo hello
