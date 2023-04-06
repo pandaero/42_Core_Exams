@@ -20,7 +20,7 @@ class	ATarget
 
 		void	getHitBySpell(const ASpell &) const;
 
-		virtual ATarget *	clone() = 0;
+		virtual ATarget *	clone() const = 0;
 
 	private:
 		std::string	type;

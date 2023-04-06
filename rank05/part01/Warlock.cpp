@@ -1,19 +1,29 @@
-#include "Warlock.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Warlock.cpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/05 15:39:40 by pandalaf          #+#    #+#             */
+/*   Updated: 2023/04/05 18:12:34 by pandalaf         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <iterator>
 #include <algorithm>
+#include <iostream>
+
+#include "Warlock.hpp"
 
 Warlock::Warlock()
 {
 
 }
 
-Warlock::Warlock(const Warlock & other):
-	name(other.name),
-	title(other.title),
-	spells(other.spells)
+Warlock::Warlock(const Warlock & other)
 {
-
+	name = other.name;
+	title = other.title;
 }
 
 Warlock::~Warlock()
@@ -28,16 +38,11 @@ Warlock &	Warlock::operator=(const Warlock & other)
 	return (*this);
 }
 
-Warlock::Warlock(const std::string & nameSet, const std::string & titleSet):
-	name(nameSet),
-	title(titleSet)
+Warlock::Warlock(const std::string & warname, const std::string & wartitle):
+	name(warname),
+	title(wartitle)
 {
 	std::cout << name << ": This looks like another boring day." << std::endl;
-}
-
-void	Warlock::introduce() const
-{
-	std::cout << name << ": I am " << name << ", " << title << "!" << std::endl;
 }
 
 const std::string &	Warlock::getName() const
@@ -50,35 +55,39 @@ const std::string &	Warlock::getTitle() const
 	return (title);
 }
 
-void	Warlock::setTitle(const std::string & titleSet)
+void	Warlock::setTitle(const std::string & wartitle)
 {
-	title = titleSet;
+	title = wartitle;
 }
-#include <iostream>
+
+void	Warlock::introduce() const
+{
+	std::cout << name << ": I am " << name << ", " << title << "!" << std::endl;
+}
+
 void	Warlock::learnSpell(ASpell * spell)
 {
-	if (find(spells.begin(), spells.end(), spell) == spells.end())
-		spells.push_back(spell);
-}
-
-void	Warlock::forgetSpell(std::string spellName)
-{
-	for (size_t i = 0; i < spells.size(); ++i)
+	if (std::find(spellCastList.begin(), spellCastList.end(), spell) == spellCastList.end())
 	{
-		if (spells[i]->getName() == spellName)
-		{
-			std::vector<ASpell *>::iterator	start = spells.begin();
-			std::advance(start, i);
-			spells.erase(start);
-		}
+		spellCastList.push_back(spell);
+		spellNameList.push_back(spell->getName());
 	}
 }
 
-void	Warlock::launchSpell(std::string spellName, const ATarget & target)
+void	Warlock::forgetSpell(std::string spellname)
 {
-	for (size_t i = 0; i < spells.size(); ++i)
+	if (std::find(spellNameList.begin(), spellNameList.end(), spellname) != spellNameList.end())
 	{
-		if (spells[i]->getName() == spellName)
-			target.getHitBySpell(*spells[i]);
+		spellNameList.erase(std::find(spellNameList.begin(), spellNameList.end(), spellname));
+		size_t	index = std::distance(spellNameList.begin(), std::find(spellNameList.begin(), spellNameList.end(), spellname));
+		std::vector<ASpell *>::iterator	castIt = spellCastList.begin();
+		std::advance(castIt, index);
+		spellCastList.erase(castIt);
 	}
+}
+
+void	Warlock::launchSpell(std::string spellname, const ATarget & target)
+{
+	if (std::find(spellNameList.begin(), spellNameList.end(), spellname) != spellNameList.end())
+		spellCastList[std::distance(spellNameList.begin(), std::find(spellNameList.begin(), spellNameList.end(), spellname))]->launch(target);
 }

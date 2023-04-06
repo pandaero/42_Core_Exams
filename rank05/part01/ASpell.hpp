@@ -23,7 +23,7 @@ class	ASpell
 
 		void	launch(const ATarget &);
 
-		virtual ASpell *	clone() = 0;
+		virtual ASpell *	clone() const = 0;
 
 	private:
 		std::string	name;

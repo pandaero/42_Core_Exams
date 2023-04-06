@@ -11,6 +11,6 @@ class	Fwoosh: public ASpell
 		~Fwoosh();
 		Fwoosh &	operator=(const Fwoosh &);
 
-		Fwoosh *	clone();
+		Fwoosh *	clone() const;
 };
 #endif

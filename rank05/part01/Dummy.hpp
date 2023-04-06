@@ -12,6 +12,6 @@ class	Dummy: public ATarget
 		~Dummy();
 		Dummy &	operator=(const Dummy &);
 
-		Dummy *	clone();
+		Dummy *	clone() const;
 };
 #endif

@@ -1,17 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Warlock.hpp                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pandalaf <pandalaf@student.42wolfsburg.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/05 15:33:43 by pandalaf          #+#    #+#             */
+/*   Updated: 2023/04/06 13:11:09 by pandalaf         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef WARLOCK_HPP
 # define WARLOCK_HPP
 
-# include "ASpell.hpp"
-# include "ATarget.hpp"
-
+# include <string>
 # include <vector>
+
+# include "ASpell.hpp"
 
 class	Warlock
 {
 	public:
-		Warlock(const Warlock &);
 		~Warlock();
-
+		Warlock &	operator=(const Warlock &);
+	
 		Warlock(const std::string &, const std::string &);
 
 		const std::string &	getName() const;
@@ -27,10 +39,11 @@ class	Warlock
 
 	private:
 		Warlock();
-		Warlock &	operator=(const Warlock &);
+		Warlock(const Warlock &);
 
-		std::string				name;
-		std::string				title;
-		std::vector<ASpell *>	spells;
+		std::string	name;
+		std::string	title;
+		std::vector<std::string>	spellNameList;
+		std::vector<ASpell *>		spellCastList;
 };
 #endif
