@@ -6,7 +6,8 @@ Fwoosh::Fwoosh()
 	setEffects("fwooshed");
 }
 
-Fwoosh::Fwoosh(const Fwoosh & other)
+Fwoosh::Fwoosh(const Fwoosh & other):
+	ASpell()
 {
 	(void) other;
 }
@@ -22,7 +23,7 @@ Fwoosh &	Fwoosh::operator=(const Fwoosh & other)
 	return (*this);
 }
 
-Fwoosh *	Fwoosh::clone()
+Fwoosh *	Fwoosh::clone() const
 {
 	return (new Fwoosh());
 }

@@ -5,7 +5,8 @@ Dummy::Dummy(): ATarget("Target Practice Dummy")
 
 }
 
-Dummy::Dummy(const Dummy & other)
+Dummy::Dummy(const Dummy & other):
+	ATarget()
 {
 	(void) other;
 }
@@ -21,7 +22,7 @@ Dummy &	Dummy::operator=(const Dummy & other)
 	return (*this);
 }
 
-Dummy *	Dummy::clone()
+Dummy *	Dummy::clone() const
 {
 	return (new Dummy());
 }
